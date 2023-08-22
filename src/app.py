@@ -8,7 +8,8 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Character, Planet, Favorite
+
 #from models import Person
 
 app = Flask(__name__)
@@ -36,14 +37,80 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+#create the endpoint with method get
 @app.route('/user', methods=['GET'])
-def handle_hello():
+def get_users():
+    results =[]
+    users = User.query.all()
+    for user in users:
+         results.append(user.serialize())
+    return jsonify(results), 200
+   
+@app.route('/character', methods=['GET'])
+def get_character():
+    results =[]
+    characters = Character.query.all()
+    for character in characters:
+         results.append(character.serialize())
+    return jsonify(results), 200
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+@app.route('/character/<int:character_id>', methods=['GET'])
+def get_character_id():
+    results =[]
+    characters = Character.query.all()
+    for character in characters:
+         results.append(character.serialize())
+    return jsonify(results), 200
 
-    return jsonify(response_body), 200
+@app.route('/planet', methods=['GET'])
+def get_planet():
+    results =[]
+    planets = Planet.query.all()
+    for planet in planets:
+        results.append(planet.serialize())
+    return jsonify(results), 200
+
+@app.route('/planet/<int:planet_id>', methods=['GET'])
+def get_planet_id():
+    results =[]
+    planets = Planet.query.all()
+    for planet in planets:
+        results.append(planet.serialize())
+    return jsonify(results), 200
+
+#add the endpoint with method post
+@app.route('/favorite/character/<int:character_id>', methods=['POST'])
+def add_new_favorite(character_id):
+        body = request.get_json()
+        favorites = Favorite()
+
+        db.session.add(favorites)
+
+        db.session.commit()
+
+        results = []
+        favorites = Favorite.query.all()
+        for favorite in favorites:
+            results.append(favorite.serialize())
+        return jsonify(results), 200
+
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_new_favorite(planet_id):
+        body = request.get_json()
+        favorites = Favorite()
+
+        db.session.add(favorites)
+
+        db.session.commit()
+
+        results = []
+        favorites = Favorite.query.all()
+        for favorite in favorites:
+            results.append(favorite.serialize())
+        return jsonify(results), 200
+
+#create the endpoint with method delete
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
